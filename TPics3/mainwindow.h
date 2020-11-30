@@ -12,7 +12,9 @@
 #include "control_panel.h"
 #include "qcustomplot.h"
 #include "displaywindow.h"
-
+#include "animation.h"
+#include <QTimer>
+#include "animationwindow.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -51,6 +53,10 @@ private:
     uchar* pixel_data;
     QPixmap pixmap;
     Control_panel *panel;
+    void updateAnimation();
+    int frame_counter;
+    Animation animation;
+
 
 };
 #endif // MAINWINDOW_H

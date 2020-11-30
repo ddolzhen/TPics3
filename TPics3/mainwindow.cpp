@@ -50,6 +50,9 @@ MainWindow::MainWindow(QWidget *parent)
     ui->customPlot_2->setVisible(false);
     ui->label_5->setVisible(false);
 
+
+
+
 }
 
 
@@ -169,7 +172,9 @@ void MainWindow::printPixels(uint* pixels,int x, int y)
 
         QPixmap pixmap=QPixmap::fromImage(*image);
         pixmap=pixmap.scaled(512,512,Qt::IgnoreAspectRatio);
+        scene->clear();
         scene->addPixmap(pixmap);
+
         ui->graphicsView->setScene(scene);
         ui->graphicsView->show();
     }
@@ -208,6 +213,24 @@ void MainWindow::dropEvent(QDropEvent *event)
         main_data->tot_hist(100,ui->customPlot_2);
         ui->label_3->setVisible(true);
         ui->label_5->setVisible(true);
+
+
+//        for (int i=0;i<20;i++)
+//        {
+//            animation.addFrame(main_data->filter(QString("toa(%1,%2)").arg(ulong((1e9+ i*(1e5))*4096/25)).arg(ulong((1e9+(i+1)*1e5)*4096/25)))->matrixOut());
+//            //qDebug() << QString("toa(%1,%2)").arg(ulong((1e9+ i*(1e5))*4096/25)).arg(ulong((1e9+(i+1)*1e5)*4096/25));
+
+//        }
+//        qDebug()<< "Contructed animation";
+
+//        QTimer *timer = new QTimer(this);
+//        connect(timer, &QTimer::timeout, this, &MainWindow::updateAnimation);
+//        timer->start(500);
+//        frame_counter=0;
+
+//        AnimationWindow* an_window=new AnimationWindow;
+//        an_window->init(main_data);
+//        an_window->show();
 
     }
 }
@@ -269,3 +292,16 @@ void MainWindow::on_radioButton_2_clicked()
 
     printPixels(pixs,256,256);
 }
+
+void MainWindow::updateAnimation()
+{
+    uint* pixs=animation.frameOut(frame_counter++);
+    if (frame_counter==20)
+    {
+        frame_counter=0;
+    }
+    printPixels(pixs,256,256);
+    qDebug() << "UPD";
+}
+
+

@@ -51,6 +51,11 @@ else()
     displaywindow.cpp
     displaywindow.h
     displaywindow.ui
+    animation.cpp
+    animation.h
+    animationwindow.cpp
+    animationwindow.h
+    animationwindow.ui
   )
 endif()
 
