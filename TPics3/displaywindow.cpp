@@ -8,6 +8,8 @@ DisplayWindow::DisplayWindow(QWidget *parent) :
     ui->setupUi(this);
 
     this->setFixedSize(this->size());
+    ui->verticalSlider->setEnabled(false);
+    new_max=0;
 }
 
 DisplayWindow::~DisplayWindow()
@@ -61,7 +63,9 @@ void DisplayWindow::printPixels(uint* pixels,int x, int y)
             max=pixels[i];
             max_pos=i;
         }
+
     }
+
     if (max==0)
     {
         qDebug()<<"Oh no..";
@@ -69,9 +73,14 @@ void DisplayWindow::printPixels(uint* pixels,int x, int y)
     {
         //qDebug() << "max is" << max<< " at " << max_pos;
 
-
+        ui->verticalSlider->setMaximum(max);
+        ui->verticalSlider->setEnabled(true);
         if (log_sc)
         {
+            if (new_max!=0)
+            {
+                max=new_max;
+            }
             for (uint i=0;i<(x*y)-1;i++){
                 double intensity_dbl= qLn(pixels[i]);
                 intensity_dbl=intensity_dbl*1023/qLn(max);
@@ -94,6 +103,9 @@ void DisplayWindow::printPixels(uint* pixels,int x, int y)
                     pixel_color=QColor(0,255,511-intensity);
                 }else if (intensity<768){
                     pixel_color=QColor(intensity-512,255,0);
+                }else if (intensity>1024)
+                {
+                    pixel_color=QColor(255,0,0);
                 }else{
                     pixel_color=QColor(255,1023-intensity,0);
                 }
@@ -103,6 +115,11 @@ void DisplayWindow::printPixels(uint* pixels,int x, int y)
             }
 
         }else{
+            if (new_max!=0)
+            {
+                max=new_max;
+                qDebug() << "Max rescaled to " << max;
+            }
 
             for (uint i=0;i<(x*y)-1;i++){
                 double intensity_dbl= double(pixels[i])*1023.0/double(max);
@@ -123,6 +140,9 @@ void DisplayWindow::printPixels(uint* pixels,int x, int y)
                     pixel_color=QColor(0,255,511-intensity);
                 }else if (intensity<768){
                     pixel_color=QColor(intensity-512,255,0);
+                }else if (intensity>1024)
+                {
+                    pixel_color=QColor(255,0,0);
                 }else{
                     pixel_color=QColor(255,1023-intensity,0);
                 }
@@ -222,7 +242,8 @@ void DisplayWindow::printPixels_TOA(ulong* pixels,int x, int y)
                     pixel_color=QColor(0,255,511-intensity);
                 }else if (intensity<768){
                     pixel_color=QColor(intensity-512,255,0);
-                }else{
+                }
+                else{
                     pixel_color=QColor(255,1023-intensity,0);
                 }
 
@@ -256,7 +277,8 @@ void DisplayWindow::printPixels_TOA(ulong* pixels,int x, int y)
                     pixel_color=QColor(0,255,511-intensity);
                 }else if (intensity<768){
                     pixel_color=QColor(intensity-512,255,0);
-                }else{
+                }
+                else{
                     pixel_color=QColor(255,1023-intensity,0);
                 }
 
@@ -330,4 +352,14 @@ void DisplayWindow::on_pushButton_clicked()
 void DisplayWindow::on_pushButton_2_clicked()
 {
     ui->stackedWidget->setCurrentIndex(0);
+}
+
+void DisplayWindow::on_pushButton_3_clicked()
+{
+    new_max=ui->verticalSlider->value();
+    qDebug()<<"New max is " << new_max;
+    uint* pixs=filtered_data->matrixOut();
+    image=new QImage();
+    image_toa=new QImage();
+    printPixels(pixs,256,256);
 }

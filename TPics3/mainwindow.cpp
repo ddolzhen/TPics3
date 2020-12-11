@@ -51,8 +51,6 @@ MainWindow::MainWindow(QWidget *parent)
     ui->label_5->setVisible(false);
 
 
-
-
 }
 
 
@@ -188,7 +186,7 @@ void MainWindow::mousePressEvent(QMouseEvent* event)
     qDebug() << "Stop clicking me!!!";
 
 
-
+    // Max width ~311
 
 }
 
