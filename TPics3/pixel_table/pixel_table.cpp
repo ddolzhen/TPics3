@@ -7,7 +7,8 @@ pixel_table::pixel_table(QFile& pixel_file)
     {
         QTextStream in_stream(&pixel_file);
 
-
+        ulong length=0;
+        ulong length_tenth=0;
         //Count lines in file
         line_ct=0;
         bool trigData=false;
@@ -49,7 +50,9 @@ pixel_table::pixel_table(QFile& pixel_file)
         tof=        new ulong       [line_ct];
         toa=        new ulong       [line_ct];
 
-
+        length=line_ct;
+        length_tenth=length/10;
+        int percentage=0;
         //Parse data
         line_ct=0;
         toa_max=0;
@@ -57,7 +60,7 @@ pixel_table::pixel_table(QFile& pixel_file)
         qDebug() << "\tMemory allocated, filling data";
         if (headerFound){
             if (!trigData){
-                while (!in_stream.atEnd()){
+                while (!in_stream.atEnd() && line_ct<=length){
 
                         QString line;
                         line=in_stream.readLine();
@@ -67,31 +70,46 @@ pixel_table::pixel_table(QFile& pixel_file)
 
                         }else{
 
-
-                                col         [line_ct]=columns[0].toUShort();
-                                row         [line_ct]=columns[1].toUShort();
-                                toa         [line_ct]=columns[2].toULong();
-                                tot         [line_ct]=columns[3].toUInt();
-                                tot_total   [line_ct]=columns[4].toULong();
-
-                                //Setting toa_min
-                                if (line_ct==1)
+                                if (columns.count() < 5)
                                 {
-                                    toa_min= toa[line_ct];
-                                }else{
-                                    if (toa[line_ct]<toa_min){
-                                        toa_min=toa[line_ct];
+                                    qDebug() << "Bad line found! Line " << line_ct;
+                                }else
+                                {
+                                    col         [line_ct]=columns[0].toUShort();
+                                    row         [line_ct]=columns[1].toUShort();
+                                    toa         [line_ct]=columns[2].toULong();
+                                    tot         [line_ct]=columns[3].toUInt();
+                                    tot_total   [line_ct]=columns[4].toULong();
+
+
+                                    //Setting toa_min
+                                    if (line_ct==1)
+                                    {
+                                        toa_min= toa[line_ct];
+                                    }else{
+                                        if (toa[line_ct]<toa_min){
+                                            toa_min=toa[line_ct];
+                                        }
+                                    }
+
+                                    //Setting toa_max
+                                    if (toa[line_ct]>toa_max){
+                                        toa_max=toa[line_ct];
+                                    }
+
+                                    if (tot[line_ct]>tot_max){
+                                        tot_max=tot[line_ct];
+                                    }
+
+
+                                    if (line_ct%length_tenth==0)
+                                    {
+                                        qDebug() << percentage << "% filled";
+                                        percentage+=10;
                                     }
                                 }
 
-                                //Setting toa_max
-                                if (toa[line_ct]>toa_max){
-                                    toa_max=toa[line_ct];
-                                }
 
-                                if (tot[line_ct]>tot_max){
-                                    tot_max=tot[line_ct];
-                                }
 
 
                                 line_ct++;
@@ -108,36 +126,42 @@ pixel_table::pixel_table(QFile& pixel_file)
                         {
 
                         }else{
-
-                                trigID      [line_ct]=columns[0].toUShort();
-                                trigTime    [line_ct]=columns[1].toUShort();
-                                col         [line_ct]=columns[2].toUShort();
-                                row         [line_ct]=columns[3].toUShort();
-                                toa         [line_ct]=columns[4].toULong();
-                                tot         [line_ct]=columns[5].toUInt();
-                                tot_total   [line_ct]=columns[6].toULong();
-
-
-                                //Setting toa_min
-                                if (line_ct==1)
+                                if (columns.count() < 5)
                                 {
-                                    toa_min= toa[line_ct];
-                                }else{
-                                    if (toa[line_ct]<toa_min){
-                                        toa_min=toa[line_ct];
+                                    qDebug() << "Bad line found! Line " << line_ct;
+                                }else
+                                {
+
+                                    trigID      [line_ct]=columns[0].toUShort();
+                                    trigTime    [line_ct]=columns[1].toUShort();
+                                    col         [line_ct]=columns[2].toUShort();
+                                    row         [line_ct]=columns[3].toUShort();
+                                    toa         [line_ct]=columns[4].toULong();
+                                    tot         [line_ct]=columns[5].toUInt();
+                                    tot_total   [line_ct]=columns[6].toULong();
+
+
+
+                                    //Setting toa_min
+                                    if (line_ct==1)
+                                    {
+                                        toa_min= toa[line_ct];
+                                    }else{
+                                        if (toa[line_ct]<toa_min){
+                                            toa_min=toa[line_ct];
+                                        }
                                     }
+
+                                    //Setting toa_max
+                                    if (toa[line_ct]>toa_max){
+                                        toa_max=toa[line_ct];
+                                    }
+
+                                    if (tot[line_ct]>tot_max){
+                                        tot_max=tot[line_ct];
+                                    }
+
                                 }
-
-                                //Setting toa_max
-                                if (toa[line_ct]>toa_max){
-                                    toa_max=toa[line_ct];
-                                }
-
-                                if (tot[line_ct]>tot_max){
-                                    tot_max=tot[line_ct];
-                                }
-
-
 
 
 
@@ -157,7 +181,7 @@ pixel_table::pixel_table(QFile& pixel_file)
 }
 
 //Constructor to use after filtering
-pixel_table::pixel_table(    ushort* trigID_p,  ulong* trigTime_p,  uchar* col_p, uchar* row_p,  ulong* toa_p, uint32_t* tot_p, ulong* tot_total_p, ulong* tof_p, uint len,ulong toa_min_t,ulong toa_max_t,ulong tot_max_t){
+pixel_table::pixel_table(    ushort* trigID_p,  ulong* trigTime_p,  uchar* col_p, uchar* row_p,  ulong* toa_p, uint32_t* tot_p, ulong* tot_total_p, ulong* tof_p, uint len,ulong toa_min_t,ulong toa_max_t,ulong tot_max_t,uchar x_min_t,uchar x_max_t, uchar y_min_t,uchar y_max_t){
     trigID=     trigID_p;
     trigTime=   trigTime_p;
     col=        col_p;
@@ -170,6 +194,13 @@ pixel_table::pixel_table(    ushort* trigID_p,  ulong* trigTime_p,  uchar* col_p
     toa_min=toa_min_t;
     toa_max=toa_max_t;
     tot_max=tot_max_t;
+
+
+    x_min_filtered=x_min_t;
+    x_max_filtered=x_max_t;
+
+    y_min_filtered=y_min_t;
+    y_max_filtered=y_max_t;
 
 
 
@@ -279,6 +310,8 @@ pixel_table* pixel_table::filter(QString format){
     bool toa_in_bounds;
     //  Filter data
     //  TODO: make data into linked list so you don't have to make 2 runs
+
+
     //      1.Count length
 
     uint len=0;
@@ -362,7 +395,7 @@ pixel_table* pixel_table::filter(QString format){
     }
 
 
-    return (new pixel_table(trigID_f,trigTime_f,col_f,row_f,toa_f,tot_f,tot_total_f,tof_f,len,toa_min_t,toa_max_t,tot_max_t));
+    return (new pixel_table(trigID_f,trigTime_f,col_f,row_f,toa_f,tot_f,tot_total_f,tof_f,len,toa_min_t,toa_max_t,tot_max_t,x_min,x_max,y_min,y_max));
 
 
 }

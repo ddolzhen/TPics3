@@ -9,7 +9,7 @@ class pixel_table
 {
 public:
     pixel_table(QFile&);
-    pixel_table(    ushort*,  ulong* ,  uchar* , uchar* ,  ulong* , uint32_t*, ulong* , ulong* , uint ,ulong,ulong,ulong);
+    pixel_table(    ushort*,  ulong* ,  uchar* , uchar* ,  ulong* , uint32_t*, ulong* , ulong* , uint ,ulong,ulong,ulong,uchar,uchar,uchar,uchar);
 
 
 
@@ -21,8 +21,13 @@ public:
     uint32_t* tot;
     ulong* tot_total;
     ulong* tof;
-    uint line_ct;
+    ulong line_ct;
 
+    uchar x_min_filtered;
+    uchar x_max_filtered;
+
+    uchar y_min_filtered;
+    uchar y_max_filtered;
 
     ulong toa_min;
     ulong toa_max;
@@ -33,6 +38,7 @@ public:
     pixel_table* filter(QString);
     void toa_hist(int nbins,QCustomPlot* customPlot);
     void tot_hist(int nbins,QCustomPlot* customPlot);
+
 
 
 
