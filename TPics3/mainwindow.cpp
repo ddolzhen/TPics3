@@ -18,8 +18,8 @@ MainWindow::MainWindow(QWidget *parent)
     setAcceptDrops(true);
 
 
-    main_data=new pixel_table(NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,0,0,0,0);
-    filtered_data=new pixel_table(NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,0,0,0,0);
+    main_data=new pixel_table(NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,0,0,0,0,0,0,0,0);
+    filtered_data=new pixel_table(NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,0,0,0,0,0,0,0,0);
     image= new QImage(512,512,QImage::Format_RGB32);
     QGraphicsScene* scene=new QGraphicsScene;
 
@@ -113,7 +113,7 @@ void MainWindow::printPixels(uint* pixels,int x, int y)
                 }
 
 
-                image->setPixelColor(i/256,255-i%256,pixel_color);
+                image->setPixelColor(255-i%256,i/256,pixel_color);
             }
 
         }else{
@@ -141,7 +141,7 @@ void MainWindow::printPixels(uint* pixels,int x, int y)
                     pixel_color=QColor(255,1023-intensity,0);
                 }
 
-                image->setPixelColor(i/256,255-i%256,pixel_color);
+                image->setPixelColor(255-i%256,i/256,pixel_color);
             }         
         }
 
@@ -197,7 +197,7 @@ void MainWindow::dropEvent(QDropEvent *event)
 
         QFile file(event->mimeData()->urls()[0].path());
         delete main_data;
-
+        qDebug() << file.fileName();
 
         qDebug() << "Creating a table";
         main_data=new pixel_table(file);
@@ -213,22 +213,6 @@ void MainWindow::dropEvent(QDropEvent *event)
         ui->label_5->setVisible(true);
 
 
-//        for (int i=0;i<20;i++)
-//        {
-//            animation.addFrame(main_data->filter(QString("toa(%1,%2)").arg(ulong((1e9+ i*(1e5))*4096/25)).arg(ulong((1e9+(i+1)*1e5)*4096/25)))->matrixOut());
-//            //qDebug() << QString("toa(%1,%2)").arg(ulong((1e9+ i*(1e5))*4096/25)).arg(ulong((1e9+(i+1)*1e5)*4096/25));
-
-//        }
-//        qDebug()<< "Contructed animation";
-
-//        QTimer *timer = new QTimer(this);
-//        connect(timer, &QTimer::timeout, this, &MainWindow::updateAnimation);
-//        timer->start(500);
-//        frame_counter=0;
-
-//        AnimationWindow* an_window=new AnimationWindow;
-//        an_window->init(main_data);
-//        an_window->show();
 
     }
 }
@@ -270,7 +254,6 @@ void MainWindow::on_filter_pb_clicked()
     DisplayWindow* filtered_window=new DisplayWindow;
     filtered_window->init(filtered_data);
     filtered_window->show();
-    //this->hide();
 }
 
 void MainWindow::on_radioButton_clicked()

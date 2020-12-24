@@ -38,12 +38,36 @@ void DisplayWindow::init(pixel_table* data_table)
     ulong* pixs_toa=filtered_data->matrixOut_TOA();
     printPixels_TOA(pixs_toa,256,256);
 
+    ui->label_4->setText(QString::number(filtered_data->x_min_filtered)+QString(" ") + QString::number(filtered_data->x_max_filtered)+QString(" ")+QString::number(filtered_data->y_min_filtered)+QString(" ")+QString::number(filtered_data->y_max_filtered));
+
+    if (filtered_data->x_max_filtered==0)
+    {
+        filtered_data->x_max_filtered=255;
+    }
+    if (filtered_data->y_max_filtered==0)
+    {
+        filtered_data->y_max_filtered=255;
+    }
+
+    int area=(filtered_data->x_max_filtered-filtered_data->x_min_filtered+1)*(filtered_data->y_max_filtered-filtered_data->y_min_filtered+1);
+
+    ulong sum=0;
+
+    for (int i=0;i<256*256;i++)
+    {
+        sum+=pixs[i];
+    }
+
+    qDebug() << "Average intensity = " << float(sum)/float(area) << "Area = "<< area << "Sum of intensities = " << sum;
+
+
 
 }
 
 
 void DisplayWindow::printPixels(uint* pixels,int x, int y)
 {
+
     bool log_sc;
     if (ui->radioButton->isChecked())
     {
@@ -111,7 +135,7 @@ void DisplayWindow::printPixels(uint* pixels,int x, int y)
                 }
 
 
-                image->setPixelColor(i/256,255-i%256,pixel_color);
+                image->setPixelColor(255-i%256,i/256,pixel_color);
             }
 
         }else{
@@ -147,7 +171,7 @@ void DisplayWindow::printPixels(uint* pixels,int x, int y)
                     pixel_color=QColor(255,1023-intensity,0);
                 }
 
-                image->setPixelColor(i/256,255-i%256,pixel_color);
+                image->setPixelColor(255-i%256,i/256,pixel_color);
             }
         }
 
@@ -362,4 +386,29 @@ void DisplayWindow::on_pushButton_3_clicked()
     image=new QImage();
     image_toa=new QImage();
     printPixels(pixs,256,256);
+}
+
+void DisplayWindow::on_pushButton_4_clicked()
+{
+    // Save to csv
+
+
+    qDebug() <<"Saving file..";
+    QFile file("./filtered_data.csv");
+
+    if (file.open(QFile::WriteOnly|QFile::Truncate))
+    {
+
+        QTextStream stream(&file);
+        stream<< "#Col,#Row,#ToA,#ToT,#ToT_total\n";
+        for (ulong i=0;i<filtered_data->line_ct;i++)
+        {
+
+            stream << filtered_data->col[i] << ',' << filtered_data->row[i] << ',' << filtered_data->toa[i] <<','<< filtered_data->tot[i]<< ','<< filtered_data->tot[i]<<'\n';
+        }
+
+        file.close();
+    }
+    qDebug() <<"File ./filtered_data.csv saved!";
+
 }

@@ -56,6 +56,9 @@ else()
     animationwindow.cpp
     animationwindow.h
     animationwindow.ui
+    pixel_table/tot_avg_window.cpp
+    pixel_table/tot_avg_window.h
+    pixel_table/tot_avg_window.ui
   )
 endif()
 
